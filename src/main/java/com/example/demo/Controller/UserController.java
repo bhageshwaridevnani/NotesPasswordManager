@@ -39,18 +39,6 @@ public class UserController extends BaseController{
     @Autowired
     private UserService userService;
 
-
-//    @PostMapping("/authenticate")
-//    public String generateToken(@RequestBody AuthRequest authrequest) throws Exception {
-//        try {
-//            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authrequest.getUserName(), authrequest.getPassword()));
-//        } catch (Exception e) {
-//            throw new Exception("Invalid username and password");
-//        }
-//
-//        return jwtUtil.generateToken(authrequest.getUserName());
-//    }
-
     @PostMapping("/signUp")
     @ApiOperation(value = "Sing Up user",
             response = ResponseEntity.class,
