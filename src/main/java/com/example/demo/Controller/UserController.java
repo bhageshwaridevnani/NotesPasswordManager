@@ -6,6 +6,7 @@ import com.example.demo.Repositroy.UserRepository;
 import com.example.demo.Security.JwtUtil;
 import com.example.demo.Service.UserService;
 import com.example.demo.Util.Constant;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.Authorization;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@Api(tags = "User API")
 public class UserController extends BaseController{
     @Autowired
     private JwtUtil jwtUtil;
@@ -36,18 +38,6 @@ public class UserController extends BaseController{
 
     @Autowired
     private UserService userService;
-
-
-//    @PostMapping("/authenticate")
-//    public String generateToken(@RequestBody AuthRequest authrequest) throws Exception {
-//        try {
-//            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authrequest.getUserName(), authrequest.getPassword()));
-//        } catch (Exception e) {
-//            throw new Exception("Invalid username and password");
-//        }
-//
-//        return jwtUtil.generateToken(authrequest.getUserName());
-//    }
 
     @PostMapping("/signUp")
     @ApiOperation(value = "Sing Up user",

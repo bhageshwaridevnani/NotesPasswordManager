@@ -4,6 +4,7 @@ import com.example.demo.DTO.NotesDTO;
 import com.example.demo.DTO.ListDTO;
 import com.example.demo.Service.NotesService;
 import com.example.demo.Util.Constant;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.Authorization;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@Api(tags = "Notes API")
 public class NotesController extends BaseController{
 
     @Autowired
