@@ -88,7 +88,8 @@ public class NotesServiceImpl extends BaseService implements NotesService {
     @Override
     public Object openNote(NotesDTO notesDTO, BindingResult bindingResult) {
         EntityNotes entityNotes = mongoTemplate.findOne(Query.query(Criteria.where("_id").is(notesDTO.getId())
-                .and("userId").is(getUserId())), EntityNotes.class);
+                .and("userId").is(getUserId())
+                .and("isDeleted").is(false)), EntityNotes.class);
         if (entityNotes == null) throw new BusinessValidationException("Notes not found");
         checkPassword(notesDTO, entityNotes);
         return entityNotes.toDTO(NotesResponseDTO.class, getMapper());
@@ -98,11 +99,11 @@ public class NotesServiceImpl extends BaseService implements NotesService {
     public Object listNotes(ListDTO listDTO) {
         Criteria criteria = Criteria.where("userId").is(getUserId())
                 .and("isDeleted").is(false);
-        if (!StringUtil.isNullOrEmpty(listDTO.getSearch())) {
-            criteria.and("title").regex(listDTO.getSearch(), "i");
-        }
         if (!StringUtil.isNullOrEmpty(listDTO.getFilter())) {
             criteria.and("category").is(listDTO.getFilter());
+        }
+        if (!StringUtil.isNullOrEmpty(listDTO.getSearch())) {
+            criteria.and("title").regex(listDTO.getSearch(), "i");
         }
         Query query = new Query(criteria);
         long totalCount = mongoTemplate.count(query, EntityNotes.class);

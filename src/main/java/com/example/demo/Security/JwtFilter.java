@@ -77,6 +77,16 @@ public class JwtFilter extends OncePerRequestFilter {
         excludeUrlPatterns.add("/login");
         excludeUrlPatterns.add("/forgotPassword");
         excludeUrlPatterns.add("/verifyOtp");
+        excludeUrlPatterns.add("/v2/api-docs");
+        excludeUrlPatterns.add("/configuration/ui");
+        excludeUrlPatterns.add("/swagger-resources/**");
+        excludeUrlPatterns.add("/configuration/security");
+        excludeUrlPatterns.add("/swagger-ui.html");
+        excludeUrlPatterns.add("/employee");
+        excludeUrlPatterns.add("/favicon.ico");
+        excludeUrlPatterns.add("/error");
+        excludeUrlPatterns.add("/webjars/**");
+        excludeUrlPatterns.add("/actuator/**");
         return excludeUrlPatterns.stream()
                 .anyMatch(p -> pathMatcher.match(p, request.getServletPath()));
     }

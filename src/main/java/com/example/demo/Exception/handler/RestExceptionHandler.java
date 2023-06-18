@@ -7,6 +7,7 @@ import com.example.demo.Exception.CommonInternalServerException;
 import com.example.demo.Service.MessageService;
 import com.example.demo.Util.Constant;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mongodb.MongoWriteException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,6 +63,28 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<Object> handleInternalServiceError(CommonInternalServerException ex, HttpServletRequest request) {
         return buildResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, INTERNAL_SERVER_ERROR_MSG);
 
+    }
+
+//    @ExceptionHandler({DataIntegrityViolationException.class})
+//    protected ResponseEntity<Object> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
+//        if (ex.getMessage().contains("E11000")) {
+//            // Handle duplicate key error
+//            return buildResponseEntity(HttpStatus.BAD_REQUEST, "Duplicate key error occurred.");
+//        } else {
+//            // Handle other data integrity violations
+//            return buildResponseEntity(HttpStatus.BAD_REQUEST, "Data integrity violation occurred.");
+//        }
+//    }
+
+    @ExceptionHandler({DataIntegrityViolationException.class})
+    protected ResponseEntity<Object> handleMongoWriteException(MongoWriteException ex) {
+        if (ex.getMessage().contains("E11000")) {
+            // Handle duplicate key error
+            return buildResponseEntity(HttpStatus.BAD_REQUEST, "This details already secure in NotesPasswordManager");
+        } else {
+            // Handle other data integrity violations
+            return buildResponseEntity(HttpStatus.BAD_REQUEST, "An error occurred while saving the password");
+        }
     }
     private ResponseEntity<Object> buildResponseEntity(HttpStatus badRequest, String errorMessage) {
         LOG.error("apiError " + errorMessage);
