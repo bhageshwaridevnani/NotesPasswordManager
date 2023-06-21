@@ -1,5 +1,6 @@
 package com.example.demo.Model;
 
+import com.example.demo.DTO.RefreshTokenDTO;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -46,6 +47,8 @@ public class EntityUser extends DateAudit implements Persistable<String> {
     private Date optGenerateDate;
 
     private long userId;
+
+    private RefreshTokenDTO refreshToken;
 
     @Override
     public boolean isNew() {

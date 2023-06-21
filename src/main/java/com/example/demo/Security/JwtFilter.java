@@ -77,6 +77,7 @@ public class JwtFilter extends OncePerRequestFilter {
         excludeUrlPatterns.add("/login");
         excludeUrlPatterns.add("/forgotPassword");
         excludeUrlPatterns.add("/verifyOtp");
+        excludeUrlPatterns.add("/refreshToken");
         excludeUrlPatterns.add("/v2/api-docs");
         excludeUrlPatterns.add("/configuration/ui");
         excludeUrlPatterns.add("/swagger-resources/**");

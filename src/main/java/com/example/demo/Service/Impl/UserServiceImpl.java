@@ -6,6 +6,7 @@ import com.example.demo.Model.EntityUser;
 import com.example.demo.Repositroy.UserRepository;
 import com.example.demo.Security.JwtUtil;
 import com.example.demo.Service.BaseService;
+import com.example.demo.Service.RefreshTokenService;
 import com.example.demo.Service.UserService;
 import io.netty.util.internal.StringUtil;
 import org.modelmapper.ModelMapper;
@@ -41,13 +42,9 @@ public class UserServiceImpl extends BaseService implements UserService {
 
     @Autowired
     private JavaMailSender mailSender;
-    //    @Autowired
-//    private MapperFacade mapper;
-//    private final ModelMapper mapper; // Autowire the ModelMapper
-//
-//    public UserServiceImpl(ModelMapper mapper) {
-//        this.mapper = mapper;
-//    }
+
+    @Autowired
+    private RefreshTokenService refreshTokenService;
 
     private static final Pattern PASSWORD_PATTERN = Pattern.compile(
             "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{6,8}$"
@@ -110,7 +107,7 @@ public class UserServiceImpl extends BaseService implements UserService {
     }
 
     @Override
-    public Object login(LoginDTO loginDTO, BindingResult bindingResult) {
+    public TokenResponseDTO login(LoginDTO loginDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             String errorMessage = bindingResult.getFieldErrors()
                     .stream()
@@ -121,7 +118,10 @@ public class UserServiceImpl extends BaseService implements UserService {
         EntityUser entityUser = mongoTemplate.findOne(Query.query(Criteria.where(EntityUser.Fields.email).is(loginDTO.getEmail())), EntityUser.class);
         if (entityUser != null) {
             if (isPasswordValid(loginDTO.getPassword(), entityUser.getPassword())) {
-                return jwtUtil.generateToken1(loginDTO.getEmail(), loginDTO.getPassword(), entityUser.getUserId());
+                return TokenResponseDTO.builder()
+                        .jwtToken(jwtUtil.generateToken1(loginDTO.getEmail(), loginDTO.getPassword(), entityUser.getUserId()))
+                        .refreshToken(refreshTokenService.generateRefreshToken(entityUser))
+                        .build();
             } else {
                 throw new BusinessValidationException("Password is invalid");
             }

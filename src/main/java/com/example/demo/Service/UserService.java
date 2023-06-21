@@ -8,7 +8,7 @@ import org.springframework.validation.BindingResult;
 public interface UserService {
     Object signUp(SignUpDTO signUpDTO, BindingResult bindingResult);
 
-    Object login(LoginDTO loginDTO,BindingResult bindingResult);
+    TokenResponseDTO login(LoginDTO loginDTO,BindingResult bindingResult);
 
     void resetPassword(ResetPasswordDTO resetPasswordDTO,BindingResult bindingResult);
 
