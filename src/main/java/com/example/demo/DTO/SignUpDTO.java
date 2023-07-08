@@ -20,6 +20,8 @@ public class SignUpDTO extends BaseDTO{
     @Email(message = "Invalid email format")
     private String email;
 
+    private String phoneNumber;
+
     private String password;
 
     private String confirmPassword;

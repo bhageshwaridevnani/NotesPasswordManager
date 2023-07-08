@@ -1,7 +1,5 @@
 package com.example.demo.Service;
 
-
-import com.example.demo.Model.EntityNotes;
 import com.example.demo.Model.EntityUser;
 import com.example.demo.Security.ExecutionContextUtil;
 import org.modelmapper.ModelMapper;
@@ -63,11 +61,11 @@ public abstract class BaseService {
     }
 //    protected final MessageService messageService;
 //    protected final MapperFacade mapper;
-
+//
 //    @Autowired
 //    private MapperFacade mapper;
-
-
+//
+//
 //    public BaseService(MapperFacade mapperFacade) {
 //        this.mapper = mapperFacade;
 ////        this.messageService = mService;

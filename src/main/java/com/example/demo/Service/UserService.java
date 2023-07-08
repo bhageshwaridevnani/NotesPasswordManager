@@ -17,4 +17,6 @@ public interface UserService {
     void verifyOtpAndSetNewPassword(ForgotPasswordDTO forgotPasswordDTO, BindingResult bindingResult);
 
     Object updateProfile(UpdateProfileDTO updateProfileDTO, BindingResult bindingResult);
+
+    Object addUserDetails(SignUpDTO signUpDTO, BindingResult bindingResult);
 }

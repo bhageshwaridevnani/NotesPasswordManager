@@ -1,5 +1,6 @@
 package com.example.demo.Model;
 
+import com.example.demo.Enum.LoginType;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -44,6 +45,8 @@ public class EntityUser extends DateAudit implements Persistable<String> {
     private String otp;
 
     private Date optGenerateDate;
+
+    private LoginType loginType;
 
     private long userId;
 

@@ -2,7 +2,9 @@ package com.example.demo.Service;
 
 import com.example.demo.DTO.ListDTO;
 import com.example.demo.DTO.PasswordDTO;
+import org.springframework.stereotype.Service;
 
+@Service
 public interface PasswordService {
     Object addPassword(PasswordDTO passwordDTO);
 

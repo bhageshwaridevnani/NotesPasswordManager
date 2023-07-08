@@ -87,6 +87,10 @@ public class JwtFilter extends OncePerRequestFilter {
         excludeUrlPatterns.add("/error");
         excludeUrlPatterns.add("/webjars/**");
         excludeUrlPatterns.add("/actuator/**");
+        excludeUrlPatterns.add("/login.html");
+        excludeUrlPatterns.add("/oauth2/callback/google");
+        excludeUrlPatterns.add("/oauth2/login");
+        excludeUrlPatterns.add("/after/callback/**");
         return excludeUrlPatterns.stream()
                 .anyMatch(p -> pathMatcher.match(p, request.getServletPath()));
     }

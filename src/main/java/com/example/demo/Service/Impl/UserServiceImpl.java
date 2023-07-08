@@ -1,6 +1,7 @@
 package com.example.demo.Service.Impl;
 
 import com.example.demo.DTO.*;
+import com.example.demo.Enum.LoginType;
 import com.example.demo.Exception.BusinessValidationException;
 import com.example.demo.Model.EntityUser;
 import com.example.demo.Repositroy.UserRepository;
@@ -96,7 +97,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         if (StringUtil.isNullOrEmpty(signUpDTO.getConfirmMasterPassword())) {
             throw new BusinessValidationException("Please enter the confirm master password");
         }
-        if (!signUpDTO.getConfirmMasterPassword().equals(signUpDTO.getMasterPassword())){
+        if (!signUpDTO.getConfirmMasterPassword().equals(signUpDTO.getMasterPassword())) {
             throw new BusinessValidationException("Both master password is not match");
         }
         String userName = signUpDTO.getFirstName() + " " + signUpDTO.getLastName();
@@ -104,6 +105,7 @@ public class UserServiceImpl extends BaseService implements UserService {
         signUpDTO.setMasterPassword(getEncryptedPassword(signUpDTO.getMasterPassword()));
         EntityUser entityUser = signUpDTO.toModel(EntityUser.class, getMapper());
         entityUser.setUserName(userName);
+        entityUser.setLoginType(LoginType.LOCAL);
         userRepository.save(entityUser);
         return entityUser.toDTO(SignUpResponseDTO.class, getMapper());
 
@@ -224,23 +226,22 @@ public class UserServiceImpl extends BaseService implements UserService {
                         .collect(Collectors.joining(", "));
                 throw new BusinessValidationException(errorMessage);
             }
-            if (!StringUtil.isNullOrEmpty(updateProfileDTO.getFirstName())){
+            if (!StringUtil.isNullOrEmpty(updateProfileDTO.getFirstName())) {
                 entityUser.setFirstName(updateProfileDTO.getFirstName());
             }
-            if (!StringUtil.isNullOrEmpty(updateProfileDTO.getLastName())){
+            if (!StringUtil.isNullOrEmpty(updateProfileDTO.getLastName())) {
                 entityUser.setLastName(updateProfileDTO.getLastName());
             }
-            if (!StringUtil.isNullOrEmpty(updateProfileDTO.getEmail())){
+            if (!StringUtil.isNullOrEmpty(updateProfileDTO.getEmail())) {
                 entityUser.setEmail(updateProfileDTO.getEmail());
             }
-            if (!StringUtil.isNullOrEmpty(updateProfileDTO.getOldMasterPassword()) && !StringUtil.isNullOrEmpty(updateProfileDTO.getMasterPassword())){
-                if (!isPasswordMatch(updateProfileDTO.getOldMasterPassword(),entityUser.getMasterPassword())){
+            if (!StringUtil.isNullOrEmpty(updateProfileDTO.getOldMasterPassword()) && !StringUtil.isNullOrEmpty(updateProfileDTO.getMasterPassword())) {
+                if (!isPasswordMatch(updateProfileDTO.getOldMasterPassword(), entityUser.getMasterPassword())) {
                     throw new BusinessValidationException("The old master password is not correct");
                 }
-                if (!StringUtil.isNullOrEmpty(updateProfileDTO.getConfirmMasterPassword()) && updateProfileDTO.getMasterPassword().equals(updateProfileDTO.getConfirmMasterPassword())){
+                if (!StringUtil.isNullOrEmpty(updateProfileDTO.getConfirmMasterPassword()) && updateProfileDTO.getMasterPassword().equals(updateProfileDTO.getConfirmMasterPassword())) {
                     entityUser.setMasterPassword(getEncryptedPassword(updateProfileDTO.getMasterPassword()));
-                }
-                else {
+                } else {
                     throw new BusinessValidationException("Please enter the correct confirm master password");
                 }
             }
@@ -251,6 +252,28 @@ public class UserServiceImpl extends BaseService implements UserService {
         }
 
         return entityUser.toDTO(SignUpResponseDTO.class, getMapper());
+    }
+
+    @Override
+    public Object addUserDetails(SignUpDTO signUpDTO, BindingResult bindingResult) {
+        EntityUser entityUser = mongoTemplate.findOne(Query.query(Criteria.where(signUpDTO.getEmail())), EntityUser.class);
+        if (entityUser != null) {
+            if (StringUtil.isNullOrEmpty(signUpDTO.getMasterPassword())) {
+                throw new BusinessValidationException("Please enter the master password to secure your notes");
+            }
+            if (StringUtil.isNullOrEmpty(signUpDTO.getConfirmMasterPassword())) {
+                throw new BusinessValidationException("Please enter the confirm master password");
+            }
+            if (!signUpDTO.getConfirmMasterPassword().equals(signUpDTO.getMasterPassword())) {
+                throw new BusinessValidationException("Both master password is not match");
+            }
+            entityUser.setMasterPassword(signUpDTO.getMasterPassword());
+            entityUser.setPhoneNumber(signUpDTO.getPhoneNumber()!=null?signUpDTO.getPhoneNumber():"");
+            userRepository.save(entityUser);
+        } else {
+            throw new BusinessValidationException("User not exists");
+        }
+        return signUpDTO;
     }
 
     private void sendOtpByEmail(String email, String otp) {
