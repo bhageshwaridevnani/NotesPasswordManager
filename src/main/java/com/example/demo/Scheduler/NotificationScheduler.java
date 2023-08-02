@@ -19,7 +19,7 @@ public class NotificationScheduler {
     @Autowired
     private NotificationEventHandler notificationEventHandler;
 
-    @Scheduled(cron = "0 46 12 * * *") // Run every day at midnight
+    @Scheduled(cron = "0 0 0 * * *") // Run every day at midnight
     public void sendNotifications() {
         LocalDateTime thirtyDaysAgo = LocalDateTime.now().minusDays(30);
         List<EntityUser> users = userRepository.findByCreatedAtBefore(thirtyDaysAgo);
