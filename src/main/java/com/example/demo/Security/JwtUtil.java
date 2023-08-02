@@ -1,9 +1,8 @@
 package com.example.demo.Security;
 
 import io.jsonwebtoken.*;
-import io.netty.util.internal.StringUtil;
 import lombok.SneakyThrows;
-import org.apache.tomcat.util.buf.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -71,7 +70,7 @@ public class JwtUtil {
         // here we are validation the username and then check the token is expired or not
         if (isTokenExpired(token)) {
             throw new RuntimeException("Token is expired");
-        } else if (StringUtil.isNullOrEmpty(username)) {
+        } else if (StringUtils.isEmpty(username)) {
             throw new RuntimeException("User not found");
         } else {
             return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
@@ -116,7 +115,7 @@ public class JwtUtil {
                 .setClaims(claims)
                 .setSubject(email)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 60 * 1000))
+                .setExpiration(new Date(System.currentTimeMillis() + 30 * 60 * 1000))
                 .signWith(SignatureAlgorithm.HS256, jwtSecret)
                 .compact();
 

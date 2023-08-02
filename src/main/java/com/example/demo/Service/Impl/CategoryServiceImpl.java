@@ -4,7 +4,7 @@ import com.example.demo.Model.EntityCategory;
 import com.example.demo.Repositroy.CategoryRepository;
 import com.example.demo.Service.BaseService;
 import com.example.demo.Service.CategoryService;
-import io.netty.util.internal.StringUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -26,7 +26,7 @@ public class CategoryServiceImpl extends BaseService implements CategoryService 
 
     @Override
     public Object addCategory(EntityCategory entityCategory) {
-        if (!StringUtil.isNullOrEmpty(entityCategory.getCategory())) {
+        if (!StringUtils.isEmpty(entityCategory.getCategory())) {
             categoryRepository.save(entityCategory);
         }
         return entityCategory;

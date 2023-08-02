@@ -11,8 +11,6 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @NoArgsConstructor
 public class PasswordResponseDTO extends BaseDTO {
 
-    private long userId;
-
     private String webUrl;
 
     private String userName;

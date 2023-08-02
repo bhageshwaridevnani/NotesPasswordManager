@@ -15,8 +15,11 @@ public class TokenResponseDTO {
 
     private String refreshToken;
 
-    public TokenResponseDTO(String jwtToken, String refreshToken) {
+    private long userId;
+
+    public TokenResponseDTO(String jwtToken, String refreshToken, long userId) {
         this.jwtToken = jwtToken;
         this.refreshToken = refreshToken;
+        this.userId = userId;
     }
 }

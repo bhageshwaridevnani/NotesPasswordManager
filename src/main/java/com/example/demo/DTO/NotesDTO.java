@@ -16,8 +16,6 @@ public class NotesDTO extends BaseDTO{
 
     private String title;
 
-    private String userId;
-
     private String noteContent;
 
     private NotesCategory category;

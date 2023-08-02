@@ -9,7 +9,6 @@ import com.example.demo.Repositroy.CategoryRepository;
 import com.example.demo.Repositroy.PasswordRepository;
 import com.example.demo.Service.BaseService;
 import com.example.demo.Service.PasswordService;
-import io.netty.util.internal.StringUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.CharacterPredicates;
 import org.apache.commons.text.RandomStringGenerator;
@@ -20,6 +19,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
@@ -48,9 +48,9 @@ public class PasswordServiceImpl extends BaseService implements PasswordService 
         if (StringUtils.isNotBlank(passwordDTO.getWebUrl())) {
             passwordDTO.setWebUrl(convertToValidUrl(passwordDTO.getWebUrl()));
         }
-        if (!StringUtil.isNullOrEmpty(passwordDTO.getCategory())){
-            EntityCategory entityCategory = mongoTemplate.findOne(Query.query(Criteria.where("category").is(passwordDTO.getCategory())),EntityCategory.class);
-            if (entityCategory == null){
+        if (!StringUtils.isEmpty(passwordDTO.getCategory())) {
+            EntityCategory entityCategory = mongoTemplate.findOne(Query.query(Criteria.where("category").is(passwordDTO.getCategory())), EntityCategory.class);
+            if (entityCategory == null) {
                 entityCategory = new EntityCategory();
                 entityCategory.setCategory(passwordDTO.getCategory());
                 categoryRepository.save(entityCategory);
@@ -88,11 +88,9 @@ public class PasswordServiceImpl extends BaseService implements PasswordService 
         }
         if (entityPassword.isSecure()) {
             checkSecurity(passwordDTO);
-        } else {
-            entityPassword.setDeleted(true);
-            passwordRepository.save(entityPassword);
         }
-
+        entityPassword.setDeleted(true);
+        passwordRepository.save(entityPassword);
     }
 
     @Override
@@ -101,19 +99,19 @@ public class PasswordServiceImpl extends BaseService implements PasswordService 
                 .withinRange('0', 'z')
                 .filteredBy(CharacterPredicates.LETTERS, CharacterPredicates.DIGITS, CharacterPredicates.ASCII_LETTERS)
                 .build();
-        return  generator.generate(8);
+        return generator.generate(8);
     }
 
     @Override
     public Object openPassword(PasswordDTO passwordDTO) {
         EntityPassword entityPassword = mongoTemplate.findOne(Query.query(Criteria.where("_id").is(passwordDTO.getId())
                 .and("userId").is(getUserId())
-                .and("isDeleted").is(false)),EntityPassword.class);
-        if (entityPassword != null){
-            if (entityPassword.isSecure()){
+                .and("isDeleted").is(false)), EntityPassword.class);
+        if (entityPassword != null) {
+            if (entityPassword.isSecure()) {
                 checkSecurity(passwordDTO);
             }
-            return entityPassword.toDTO(PasswordResponseDTO.class,getMapper());
+            return entityPassword.toDTO(PasswordResponseDTO.class, getMapper());
         }
         return null;
     }
@@ -122,13 +120,13 @@ public class PasswordServiceImpl extends BaseService implements PasswordService 
     public Object listPassword(ListDTO listDTO) {
         Criteria criteria = Criteria.where("userId").is(getUserId())
                 .and("isDeleted").is(false);
-        if (!StringUtil.isNullOrEmpty(listDTO.getFilter())){
+        if (!StringUtils.isEmpty(listDTO.getFilter())) {
             criteria.and("category").is(listDTO.getFilter());
         }
-        if (!StringUtil.isNullOrEmpty(listDTO.getSearch())) {
+        if (!StringUtils.isEmpty(listDTO.getSearch())) {
             criteria.orOperator(Criteria.where("title").regex(listDTO.getSearch(), "i"),
-                        Criteria.where("userName").regex(listDTO.getSearch(),"i"),
-                        Criteria.where("email").regex(listDTO.getSearch(),"i"));
+                    Criteria.where("userName").regex(listDTO.getSearch(), "i"),
+                    Criteria.where("email").regex(listDTO.getSearch(), "i"));
         }
         Query query = new Query(criteria);
         long totalCount = mongoTemplate.count(query, EntityPassword.class);
@@ -145,11 +143,11 @@ public class PasswordServiceImpl extends BaseService implements PasswordService 
             }
         }
         List<PasswordResponseDTO> passwordResponseDTOS = mongoTemplate.find(query, PasswordResponseDTO.class, "entityPassword");
-        return new SearchResultDTO<>(passwordResponseDTOS,totalCount,listDTO.getLimit());
+        return new SearchResultDTO<>(passwordResponseDTOS, totalCount, listDTO.getLimit());
     }
 
     private void checkSecurity(PasswordDTO passwordDTO) {
-        if (StringUtil.isNullOrEmpty(passwordDTO.getMasterPassword())) {
+        if (StringUtils.isEmpty(passwordDTO.getMasterPassword())) {
             throw new BusinessValidationException("Please provide master password as this password save with master password");
         }
         if (!isPasswordMatch(passwordDTO.getMasterPassword(), getMasterPassword())) {

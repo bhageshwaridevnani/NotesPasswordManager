@@ -1,7 +1,6 @@
 package com.example.demo.Controller;
 
 import com.example.demo.DTO.*;
-import com.example.demo.Model.AuthRequest;
 import com.example.demo.Repositroy.UserRepository;
 import com.example.demo.Security.JwtUtil;
 import com.example.demo.Service.UserService;
@@ -13,10 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -94,5 +91,14 @@ public class UserController extends BaseController{
             authorizations = {@Authorization(value = Constant.API_KEY)})
     public ResponseEntity<?> updateProfile(@Validated @RequestBody UpdateProfileDTO updateProfileDTO, BindingResult bindingResult) throws Exception {
         return okSuccessResponse(userService.updateProfile(updateProfileDTO,bindingResult),"Profile Update Successfully");
+    }
+
+    @PostMapping("/verifyUser")
+    @ApiOperation(value = "Verify user",
+            response = ResponseEntity.class,
+            produces = "application/json",
+            authorizations = {@Authorization(value = Constant.API_KEY)})
+    public ResponseEntity<?> checkSecurity(@Validated @RequestBody SecurityDTO securityDTO ) throws Exception {
+        return okSuccessResponse(userService.verifyUser(securityDTO),"Verify user");
     }
 }

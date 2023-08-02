@@ -1,7 +1,6 @@
 package com.example.demo.Service;
 
 import com.example.demo.DTO.*;
-import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 
 
@@ -17,4 +16,6 @@ public interface UserService {
     void verifyOtpAndSetNewPassword(ForgotPasswordDTO forgotPasswordDTO, BindingResult bindingResult);
 
     Object updateProfile(UpdateProfileDTO updateProfileDTO, BindingResult bindingResult);
+
+    boolean verifyUser(SecurityDTO securityDTO);
 }

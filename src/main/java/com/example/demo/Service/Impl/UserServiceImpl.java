@@ -8,7 +8,7 @@ import com.example.demo.Security.JwtUtil;
 import com.example.demo.Service.BaseService;
 import com.example.demo.Service.RefreshTokenService;
 import com.example.demo.Service.UserService;
-import io.netty.util.internal.StringUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -84,13 +84,13 @@ public class UserServiceImpl extends BaseService implements UserService {
         if (!PASSWORD_PATTERN.matcher(signUpDTO.getPassword()).matches()) {
             throw new BusinessValidationException("Password must contain 6 to 8 characters, including one uppercase letter, one lowercase letter, one special character, and no whitespace.");
         }
-        if (StringUtil.isNullOrEmpty(signUpDTO.getConfirmPassword()) && !signUpDTO.getPassword().equals(signUpDTO.getConfirmPassword())) {
+        if (StringUtils.isEmpty(signUpDTO.getConfirmPassword()) && !signUpDTO.getPassword().equals(signUpDTO.getConfirmPassword())) {
             throw new BusinessValidationException("Please enter the confirm password correct.");
         }
-        if (StringUtil.isNullOrEmpty(signUpDTO.getMasterPassword())) {
+        if (StringUtils.isEmpty(signUpDTO.getMasterPassword())) {
             throw new BusinessValidationException("Please enter the master password to secure your notes");
         }
-        if (StringUtil.isNullOrEmpty(signUpDTO.getConfirmMasterPassword())) {
+        if (StringUtils.isEmpty(signUpDTO.getConfirmMasterPassword())) {
             throw new BusinessValidationException("Please enter the confirm master password");
         }
         if (!signUpDTO.getConfirmMasterPassword().equals(signUpDTO.getMasterPassword())){
@@ -121,6 +121,7 @@ public class UserServiceImpl extends BaseService implements UserService {
                 return TokenResponseDTO.builder()
                         .jwtToken(jwtUtil.generateToken1(loginDTO.getEmail(), loginDTO.getPassword(), entityUser.getUserId()))
                         .refreshToken(refreshTokenService.generateRefreshToken(entityUser))
+                        .userId(entityUser.getUserId())
                         .build();
             } else {
                 throw new BusinessValidationException("Password is invalid");
@@ -224,20 +225,20 @@ public class UserServiceImpl extends BaseService implements UserService {
                         .collect(Collectors.joining(", "));
                 throw new BusinessValidationException(errorMessage);
             }
-            if (!StringUtil.isNullOrEmpty(updateProfileDTO.getFirstName())){
+            if (!StringUtils.isEmpty(updateProfileDTO.getFirstName())){
                 entityUser.setFirstName(updateProfileDTO.getFirstName());
             }
-            if (!StringUtil.isNullOrEmpty(updateProfileDTO.getLastName())){
+            if (!StringUtils.isEmpty(updateProfileDTO.getLastName())){
                 entityUser.setLastName(updateProfileDTO.getLastName());
             }
-            if (!StringUtil.isNullOrEmpty(updateProfileDTO.getEmail())){
+            if (!StringUtils.isEmpty(updateProfileDTO.getEmail())){
                 entityUser.setEmail(updateProfileDTO.getEmail());
             }
-            if (!StringUtil.isNullOrEmpty(updateProfileDTO.getOldMasterPassword()) && !StringUtil.isNullOrEmpty(updateProfileDTO.getMasterPassword())){
+            if (!StringUtils.isEmpty(updateProfileDTO.getOldMasterPassword()) && StringUtils.isEmpty(updateProfileDTO.getMasterPassword())){
                 if (!isPasswordMatch(updateProfileDTO.getOldMasterPassword(),entityUser.getMasterPassword())){
                     throw new BusinessValidationException("The old master password is not correct");
                 }
-                if (!StringUtil.isNullOrEmpty(updateProfileDTO.getConfirmMasterPassword()) && updateProfileDTO.getMasterPassword().equals(updateProfileDTO.getConfirmMasterPassword())){
+                if (!StringUtils.isEmpty(updateProfileDTO.getConfirmMasterPassword()) && updateProfileDTO.getMasterPassword().equals(updateProfileDTO.getConfirmMasterPassword())){
                     entityUser.setMasterPassword(getEncryptedPassword(updateProfileDTO.getMasterPassword()));
                 }
                 else {
@@ -252,6 +253,8 @@ public class UserServiceImpl extends BaseService implements UserService {
 
         return entityUser.toDTO(SignUpResponseDTO.class, getMapper());
     }
+
+
 
     private void sendOtpByEmail(String email, String otp) {
         try {
@@ -277,5 +280,13 @@ public class UserServiceImpl extends BaseService implements UserService {
             otp.append(otpChar);
         }
         return otp.toString();
+    }
+
+    @Override
+    public boolean verifyUser(SecurityDTO securityDTO) {
+        if (StringUtils.isEmpty(securityDTO.getMasterPassword())) {
+            return false;
+        }
+        return isPasswordMatch(securityDTO.getMasterPassword(), getMasterPassword());
     }
 }

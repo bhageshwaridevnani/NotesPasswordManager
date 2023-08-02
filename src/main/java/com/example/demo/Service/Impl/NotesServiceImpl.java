@@ -7,7 +7,7 @@ import com.example.demo.Model.EntityUser;
 import com.example.demo.Repositroy.NotesRepository;
 import com.example.demo.Service.BaseService;
 import com.example.demo.Service.NotesService;
-import io.netty.util.internal.StringUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -39,7 +39,7 @@ public class NotesServiceImpl extends BaseService implements NotesService {
             throw new BusinessValidationException("User not found");
         }
         EntityNotes entityNotes = new EntityNotes();
-        if (StringUtil.isNullOrEmpty(notesDTO.getTitle())) {
+        if (StringUtils.isEmpty(notesDTO.getTitle())) {
             throw new BusinessValidationException("Title cannot be null or empty");
         }
         entityNotes = mongoTemplate.findOne(Query.query(Criteria.where("userId").is(getUserId())
@@ -47,7 +47,7 @@ public class NotesServiceImpl extends BaseService implements NotesService {
         if (entityNotes != null) {
             throw new BusinessValidationException("This title notes already present");
         }
-        if (StringUtil.isNullOrEmpty(notesDTO.getCategory().name())) {
+        if (StringUtils.isEmpty(notesDTO.getCategory().name())) {
             throw new BusinessValidationException("Please select the category of your note");
         }
         entityNotes = notesDTO.toModel(EntityNotes.class, getMapper());
@@ -99,10 +99,10 @@ public class NotesServiceImpl extends BaseService implements NotesService {
     public Object listNotes(ListDTO listDTO) {
         Criteria criteria = Criteria.where("userId").is(getUserId())
                 .and("isDeleted").is(false);
-        if (!StringUtil.isNullOrEmpty(listDTO.getFilter())) {
+        if (!StringUtils.isEmpty(listDTO.getFilter())) {
             criteria.and("category").is(listDTO.getFilter());
         }
-        if (!StringUtil.isNullOrEmpty(listDTO.getSearch())) {
+        if (!StringUtils.isEmpty(listDTO.getSearch())) {
             criteria.and("title").regex(listDTO.getSearch(), "i");
         }
         Query query = new Query(criteria);
@@ -125,7 +125,7 @@ public class NotesServiceImpl extends BaseService implements NotesService {
 
     private void checkPassword(NotesDTO notesDTO, EntityNotes entityNotes) {
         if (entityNotes.isSecure()) {
-            if (StringUtil.isNullOrEmpty(notesDTO.getMasterPassword())) {
+            if (StringUtils.isEmpty(notesDTO.getMasterPassword())) {
                 throw new BusinessValidationException("This note is secure with master password you need to provide master password.");
             }
             if (!isPasswordMatch(notesDTO.getMasterPassword(), getMasterPassword())) {

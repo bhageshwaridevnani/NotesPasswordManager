@@ -1,8 +1,10 @@
 package com.example.demo.Security;
+
 ;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -11,9 +13,6 @@ import java.io.Serializable;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
-/**
- * Created by parita on 14/5/20
- */
 
 public class ExecutionContextUtil implements Serializable {
 
@@ -41,13 +40,10 @@ public class ExecutionContextUtil implements Serializable {
         this.threadId = threadId;
         this.jwtUtil = new JwtUtil();
     }
+
     private Long userId;
-
-
-
-    private String  userName;
+    private String userName;
     private final int threadId;
-
 
 
     public static synchronized ExecutionContextUtil getContext() {
@@ -68,9 +64,12 @@ public class ExecutionContextUtil implements Serializable {
     public ExecutionContextUtil init(HttpServletRequest httpRequest) {
 
         String token = httpRequest.getHeader("X-ACCESS-TOKEN");
-        userName = extractUsername(token);
-        userId = extractUserId(token);
-
+        if (StringUtils.isNotEmpty(token)) {
+            userName = extractUsername(token);
+            userId = extractUserId(token);
+        } else {
+            userId = Long.valueOf(httpRequest.getHeader("userId"));
+        }
         /**
          * This is for tenantId
          */
@@ -84,13 +83,13 @@ public class ExecutionContextUtil implements Serializable {
     }
 
     private String extractUsername(String token) {
-            return jwtUtil.extractUsername(token);
+        return jwtUtil.extractUsername(token);
 //        Claims claims = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody();
 //        return claims.get("email").toString();
     }
 
 
-    public  String getUserName() {
+    public String getUserName() {
         return userName;
     }
 
@@ -111,7 +110,6 @@ public class ExecutionContextUtil implements Serializable {
     public void setUserId(Long userId) {
         this.userId = userId;
     }
-
 
 
 }
