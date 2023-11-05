@@ -11,6 +11,8 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import java.util.Base64;
+
 public abstract class BaseService {
 
 
@@ -61,6 +63,18 @@ public abstract class BaseService {
             return entityUser.getMasterPassword();
         return null;
     }
+
+    public String decryptString(String data){
+
+        // Decode the Base64 string
+        byte[] decodedBytes = Base64.getDecoder().decode(data);
+
+        // Convert the decoded bytes to a String
+        return new String(decodedBytes);
+
+    }
+
+
 //    protected final MessageService messageService;
 //    protected final MapperFacade mapper;
 
